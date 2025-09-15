@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
-
+import './App.css'; // This can be replaced with Tailwind-only styles
 // Import components
 import LoginForm from './components/LoginForm';
 import Header from './components/Header';
 import SubscriptionInfo from './components/SubscriptionInfo';
 import NoteForm from './components/NoteForm';
 import NotesList from './components/NotesList';
+import NoteEdit from './components/NoteEdit';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'https://multinote-backend.onrender.com';
 
@@ -16,7 +16,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+  const [editingNote, setEditingNote] = useState(null);
+
   // Check for existing token on mount
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -25,7 +26,9 @@ function App() {
     }
   }, []);
 
-  // Fetch user info
+  // All other functions (`fetchUserInfo`, `handleLogin`, `handleLogout`, etc.) remain the same.
+  // I will not repeat them here for brevity.
+
   const fetchUserInfo = async (token) => {
     try {
       const response = await fetch(`${API_BASE}/auth/me`, {
@@ -50,7 +53,6 @@ function App() {
     }
   };
 
-  // Login
   const handleLogin = async (loginData) => {
     setLoading(true);
     setError('');
@@ -80,14 +82,12 @@ function App() {
     }
   };
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
     setNotes([]);
   };
 
-  // Fetch notes
   const fetchNotes = async (token = localStorage.getItem('token')) => {
     try {
       const response = await fetch(`${API_BASE}/notes`, {
@@ -106,7 +106,6 @@ function App() {
     }
   };
 
-  // Create or update note
   const handleNoteSubmit = async (noteData, isEdit, editingNoteId) => {
     setLoading(true);
     setError('');
@@ -140,7 +139,6 @@ function App() {
     }
   };
 
-  // Delete note
   const handleDeleteNote = async (noteId) => {
     if (!window.confirm('Are you sure you want to delete this note?')) {
       return;
@@ -167,7 +165,6 @@ function App() {
     }
   };
 
-  // Upgrade subscription
   const handleUpgrade = async () => {
     if (!user || user.role !== 'admin') {
       setError('Only admins can upgrade subscriptions');
@@ -191,7 +188,6 @@ function App() {
 
       if (response.ok) {
         setSuccess('Successfully upgraded to Pro plan!');
-        // Refresh user info
         fetchUserInfo(localStorage.getItem('token'));
       } else {
         setError(data.error || 'Failed to upgrade');
@@ -203,7 +199,6 @@ function App() {
     }
   };
 
-  // Clear messages
   useEffect(() => {
     if (error || success) {
       const timer = setTimeout(() => {
@@ -216,12 +211,12 @@ function App() {
 
   if (!user) {
     return (
-      <div className="app">
-        <div className="container">
-          <LoginForm 
-            onLogin={handleLogin} 
-            loading={loading} 
-            error={error} 
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+          <LoginForm
+            onLogin={handleLogin}
+            loading={loading}
+            error={error}
           />
         </div>
       </div>
@@ -229,32 +224,41 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <div className="container">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+      <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-xl">
         <Header user={user} onLogout={handleLogout} />
-        
-        {error && <div className="alert alert-error">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
 
-        <SubscriptionInfo 
-          user={user} 
+        {error && <div className="p-4 bg-red-100 text-red-700 rounded-md mb-4">{error}</div>}
+        {success && <div className="p-4 bg-green-100 text-green-700 rounded-md mb-4">{success}</div>}
+
+        <SubscriptionInfo
+          user={user}
           notesCount={notes.length}
           onUpgrade={handleUpgrade}
           loading={loading}
         />
 
-        <NoteForm 
+        <NoteForm
           onSubmit={handleNoteSubmit}
           user={user}
           notesCount={notes.length}
           loading={loading}
         />
 
-        <NotesList 
+        <NotesList
           notes={notes}
-          onEditNote={handleNoteSubmit}
+          onEditNote={(note) => setEditingNote(note)}
           onDeleteNote={handleDeleteNote}
         />
+
+        {editingNote && (
+          <NoteEdit
+            initialData={editingNote}
+            onSubmit={(data) => handleNoteSubmit(data, true, editingNote._id)}
+            onCancel={() => setEditingNote(null)}
+          />
+        )}
+
       </div>
     </div>
   );

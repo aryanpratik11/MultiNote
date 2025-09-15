@@ -43,7 +43,7 @@ const SubscriptionInfo = ({ user, notesCount, onUpgrade, loading }) => {
       )}
       
       {notesLimitReached && user.role !== 'admin' && (
-        <div className="limit-warning">
+        <div className="bg-red-100 text-red-700 p-3 rounded-md text-sm text-center">
           <p>You've reached the 3-note limit. Ask your admin to upgrade to Pro.</p>
         </div>
       )}
