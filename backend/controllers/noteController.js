@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Note from '../models/Note.js';
 import Tenant from '../models/Tenant.js';
 
@@ -42,10 +43,16 @@ export const getNote = async (req, res) => {
 
 export const updateNote = async (req, res) => {
   const { title, content } = req.body;
+  const noteId = req.params.id;
+
   if (!title) return res.status(400).json({ error: 'Title is required' });
+  if (!noteId) return res.status(400).json({ error: 'Note ID is required' });
+  if (!mongoose.Types.ObjectId.isValid(noteId)) {
+    return res.status(400).json({ error: 'Invalid note ID' });
+  }
 
   const note = await Note.findOneAndUpdate(
-    { _id: req.params.id, tenant_id: req.user.tenant_id },
+    { _id: noteId, tenant_id: req.user.tenant_id },
     { title, content, updated_at: Date.now() },
     { new: true }
   );
