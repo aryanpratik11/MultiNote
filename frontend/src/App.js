@@ -8,7 +8,7 @@ import SubscriptionInfo from './components/SubscriptionInfo';
 import NoteForm from './components/NoteForm';
 import NotesList from './components/NotesList';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'https://multinote-backend.onrender.com/';
+const API_BASE = process.env.REACT_APP_API_URL || 'https://multinote-backend.onrender.com';
 
 function App() {
   const [user, setUser] = useState(null);
