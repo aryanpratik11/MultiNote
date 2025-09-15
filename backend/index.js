@@ -6,13 +6,13 @@ import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
-import { connectDB } from "../config/db.js";
-import Tenant from "../models/Tenant.js";
-import User from "../models/User.js";
-import Note from "../models/Note.js";
-import noteRoutes from '../routes/noteRoutes.js';
-import tenantRoutes from '../routes/tenantRoutes.js';
-import authRoutes from '../routes/authRoute.js';
+import { connectDB } from "./config/db.js";
+import Tenant from "./models/Tenant.js";
+import User from "./models/User.js";
+import Note from "./models/Note.js";
+import noteRoutes from './routes/noteRoutes.js';
+import tenantRoutes from './routes/tenantRoutes.js';
+import authRoutes from './routes/authRoute.js';
 
 dotenv.config();
 
