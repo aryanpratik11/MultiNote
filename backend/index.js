@@ -35,6 +35,9 @@ app.use(limiter);
 app.use('/auth', authRoutes);
 app.use('/tenants', tenantRoutes);
 app.use('/notes', noteRoutes);
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 
 connectDB().then(() => {
   app.listen(PORT, async () => {
